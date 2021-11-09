@@ -1,1 +1,3 @@
 pysimplegui
+opencv-python
+pandas
