@@ -19,6 +19,7 @@ class Seek:
         return imgbytes
 
     def _event_loop(self, window):
+        BOX_SIZE = 25
         while True:
             event, values = window.read()
             if event == 'Exit' or event == sg.WIN_CLOSED:
@@ -49,6 +50,17 @@ class Seek:
                 except BaseException as e:
                     self.logger.error(e, exc_info=True)
                     pass
+            elif event == '-IMAGE-':
+                # mouse = values['-IMAGE-']
+                # if mouse == (None, None):
+                #     continue
+                # box_x = mouse[0]//BOX_SIZE
+                # box_y = mouse[1]//BOX_SIZE
+                # letter_location = (box_x * BOX_SIZE + 18, box_y * BOX_SIZE + 17)
+                # print(box_x, box_y)
+                # g.draw_text('{}'.format(random.choice(string.ascii_uppercase)),
+                #             letter_location, font='Courier 25')
+                ...
 
     def run(self):
         sg.theme('LightGreen')
@@ -69,7 +81,7 @@ class Seek:
         image_viewer_column = [
             [sg.Text('Choose an image from list on left:')],
             [sg.Text(size=(40, 1), key='-TOUT-')],
-            [sg.Image(key='-IMAGE-')],
+            [sg.Image(key='-IMAGE-', enable_events=True)],
         ]
         # ----- Full layout -----
         layout = [
