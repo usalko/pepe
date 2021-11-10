@@ -1,103 +1,154 @@
-import os
-from logging import Logger
-from typing import AnyStr
 
-import cv2
-import numpy as np
-import PySimpleGUI as sg
+# -*- coding: utf-8 -*-
+
+from remi.gui import *
+from remi import start, App
+from widgets.svg_composed_poly import SvgComposedPoly
 
 
-class Seek:
+class PepeApp(App):
+    def __init__(self, *args, **kwargs):
+        # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
+        if not 'editing_mode' in kwargs.keys():
+            super(PepeApp, self).__init__(
+                *args, static_file_path={'my_res': './res/'})
 
-    def __init__(self, folder: str = '.'):
-        self.folder = folder
-        self.logger = Logger(__file__)
+    def idle(self):
+        # idle function called every update cycle
+        pass
 
-    def _read_image_file(self, filename: str) -> AnyStr:
-        frame = cv2.imread(filename)
-        imgbytes = cv2.imencode(".png", frame)[1].tobytes()
-        return imgbytes
+    def main(self):
+        return PepeApp.construct_ui(self)
 
-    def _event_loop(self, window):
-        BOX_SIZE = 25
-        while True:
-            event, values = window.read()
-            if event == 'Exit' or event == sg.WIN_CLOSED:
-                break
-            # Folder name was filled in, make a list of files in the folder
-            if event == '-FOLDER-':
-                self.folder = values['-FOLDER-']
-                try:
-                    # Get list of files in folder
-                    file_list = os.listdir(self.folder)
-                except:
-                    file_list = []
+    def on_img_mousedown(self, widget, x, y):
+        svg_glass: Svg = widget
+        svg_glass.append(SvgCircle(x, y, 30))
+        print(f'Image mouse down ({x}, {y})!')
+        svg_glass.redraw()
 
-                fnames = [
-                    f
-                    for f in file_list
-                    if os.path.isfile(os.path.join(self.folder, f))
-                    and f.lower().endswith(('.png', '.gif', '.jpeg', 'jpg'))
-                ]
-                window['-FILE LIST-'].update(fnames)
-            elif event == '-FILE LIST-':  # A file was chosen from the listbox
-                try:
-                    filename = os.path.join(
-                        values['-FOLDER-'], values['-FILE LIST-'][0]
-                    )
-                    window['-TOUT-'].update(filename)
-                    window['-IMAGE-'].update(data=self._read_image_file(filename))
-                except BaseException as e:
-                    self.logger.error(e, exc_info=True)
-                    pass
-            elif event == '-IMAGE-':
-                # mouse = values['-IMAGE-']
-                # if mouse == (None, None):
-                #     continue
-                # box_x = mouse[0]//BOX_SIZE
-                # box_y = mouse[1]//BOX_SIZE
-                # letter_location = (box_x * BOX_SIZE + 18, box_y * BOX_SIZE + 17)
-                # print(box_x, box_y)
-                # g.draw_text('{}'.format(random.choice(string.ascii_uppercase)),
-                #             letter_location, font='Courier 25')
-                ...
+    @staticmethod
+    def construct_ui(self):
+        # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
+        container0 = Container()
+        container0.attr_class = 'Container'
+        container0.attr_editor_newclass = False
+        container0.css_height = 'calc(100% - 30px)'
+        container0.css_left = '15.0px'
+        container0.css_position = 'absolute'
+        container0.css_top = '15.0px'
+        container0.css_width = 'calc(100% - 30px)'
+        container0.variable_name = 'container0'
+        hbox0 = HBox()
+        hbox0.attr_class = 'HBox'
+        hbox0.attr_editor_newclass = False
+        hbox0.css_align_items = 'center'
+        hbox0.css_display = 'flex'
+        hbox0.css_flex_direction = 'row'
+        hbox0.css_height = '100%'
+        hbox0.css_justify_content = 'space-around'
+        hbox0.css_left = '0px'
+        hbox0.css_position = 'absolute'
+        hbox0.css_top = '0px'
+        hbox0.css_width = '100%'
+        hbox0.variable_name = 'hbox0'
+        vbox0 = VBox()
+        vbox0.attr_class = 'VBox'
+        vbox0.attr_editor_newclass = False
+        vbox0.css_align_items = 'center'
+        vbox0.css_display = 'flex'
+        vbox0.css_flex_direction = 'column'
+        vbox0.css_height = '100%'
+        vbox0.css_justify_content = 'space-around'
+        vbox0.css_order = '-1'
+        vbox0.css_position = 'static'
+        vbox0.css_top = '0px'
+        vbox0.css_width = '20%'
+        vbox0.variable_name = 'vbox0'
+        file_list = ListView()
+        file_list.attr_class = 'ListView'
+        file_list.attr_editor_newclass = False
+        file_list.css_height = '80%'
+        file_list.css_order = '-1'
+        file_list.css_position = 'static'
+        file_list.css_top = '0px'
+        file_list.css_width = '100%'
+        file_list.variable_name = 'listview0'
+        vbox0.append(file_list, 'listview0')
+        filefoldernavigator = FileFolderNavigator()
+        filefoldernavigator.allow_file_selection = True
+        filefoldernavigator.allow_folder_selection = False
+        filefoldernavigator.attr_class = 'FileFolderNavigator'
+        filefoldernavigator.attr_editor_newclass = False
+        filefoldernavigator.css_display = 'grid'
+        filefoldernavigator.css_grid_template_areas = "'button_back url_editor button_go''items items items'"
+        filefoldernavigator.css_grid_template_columns = '30px auto 30px'
+        filefoldernavigator.css_grid_template_rows = '30px auto'
+        filefoldernavigator.css_height = '20%'
+        filefoldernavigator.css_order = '-1'
+        filefoldernavigator.css_position = 'static'
+        filefoldernavigator.css_top = '20px'
+        filefoldernavigator.css_width = '100%'
+        filefoldernavigator.multiple_selection = False
+        filefoldernavigator.selection_folder = '.'
+        filefoldernavigator.variable_name = 'filefoldernavigator0'
+        vbox0.append(filefoldernavigator, 'filefoldernavigator0')
+        hbox0.append(vbox0, 'vbox0')
+        image_container = Container()
+        image_container.attr_class = 'Container'
+        image_container.attr_editor_newclass = False
+        image_container.css_height = '100%'
+        image_container.css_order = '-1'
+        image_container.css_position = 'static'
+        image_container.css_top = '0px'
+        image_container.css_width = '80%'
+        image_container.variable_name = 'container1'
+        e_image = Image()
+        e_image.attr_class = 'Image'
+        e_image.attr_editor_newclass = False
+        e_image.attr_src = ''
+        e_image.css_align_content = 'flex-start'
+        e_image.css_height = '100%'
+        e_image.css_left = '20%'
+        e_image.css_position = 'static'
+        e_image.css_top = '0px'
+        e_image.css_width = '100%'
+        e_image.variable_name = 'image0'
+        image_container.append(e_image, 'image0')
+        svg_glass = Svg()
+        svg_glass.attr_class = 'Svg'
+        svg_glass.attr_editor_newclass = False
+        svg_glass.css_align_content = 'flex-start'
+        svg_glass.css_height = '100%'
+        svg_glass.css_left = '20%'
+        svg_glass.css_position = 'absolute'
+        svg_glass.css_top = '0px'
+        svg_glass.css_width = '80%'
+        svg_glass.variable_name = 'svg0'
+        image_container.append(svg_glass, 'svg0')
+        hbox0.append(image_container, 'container1')
+        container0.append(hbox0, 'hbox0')
 
-    def run(self):
-        sg.theme('LightGreen')
-        # The window layout in 2 columns
-        file_list_column = [
-            [
-                sg.Text('Image Folder'),
-                sg.In(size=(25, 1), enable_events=True, key='-FOLDER-'),
-                sg.FolderBrowse(),
-            ],
-            [
-                sg.Listbox(
-                    values=[], enable_events=True, size=(40, 20), key='-FILE LIST-'
-                )
-            ],
-        ]
-        # For now will only show the name of the file that was chosen
-        image_viewer_column = [
-            [sg.Text('Choose an image from list on left:')],
-            [sg.Text(size=(40, 1), key='-TOUT-')],
-            [sg.Image(key='-IMAGE-', enable_events=True)],
-        ]
-        # ----- Full layout -----
-        layout = [
-            [
-                sg.Column(file_list_column),
-                sg.VSeperator(),
-                sg.Column(image_viewer_column),
-            ]
-        ]
+        # Setup logic
+        svg_glass.onmousedown.do(self.on_img_mousedown)
 
-        window = sg.Window('Pepe seek', layout)
+        self.container0 = container0
+        return self.container0
 
-        self._event_loop(window)
 
-        window.close()
-
+# Configuration
+configuration = {'config_project_name': 'pepe',
+                 'config_address': '0.0.0.0',
+                 'config_port': 8081,
+                 'config_multiple_instance': True,
+                 'config_enable_file_cache': True,
+                 'config_start_browser': True,
+                 'config_resourcepath': './res/'}
 
 if __name__ == '__main__':
-    Seek().run()
+    # start(MyApp,address='127.0.0.1', port=8081, multiple_instance=False,enable_file_cache=True, update_interval=0.1, start_browser=True)
+    start(PepeApp,
+          address=configuration['config_address'],
+          port=configuration['config_port'],
+          multiple_instance=configuration['config_multiple_instance'],
+          enable_file_cache=configuration['config_enable_file_cache'],
+          start_browser=configuration['config_start_browser'])
