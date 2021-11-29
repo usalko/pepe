@@ -3,7 +3,6 @@
 
 from remi.gui import *
 from remi import start, App
-from widgets.svg_composed_poly import SvgComposedPoly
 
 
 class PepeApp(App):
@@ -25,6 +24,9 @@ class PepeApp(App):
         svg_glass.append(SvgCircle(x, y, 30))
         print(f'Image mouse down ({x}, {y})!')
         svg_glass.redraw()
+
+    def on_folder_selected(self, widget, folder_item_widget, folder_item):
+        print(f'Folder item selected {folder_item}')
 
     @staticmethod
     def construct_ui(self):
@@ -75,8 +77,8 @@ class PepeApp(App):
         file_list.variable_name = 'listview0'
         vbox0.append(file_list, 'listview0')
         filefoldernavigator = FileFolderNavigator()
-        filefoldernavigator.allow_file_selection = True
-        filefoldernavigator.allow_folder_selection = False
+        filefoldernavigator.allow_file_selection = False
+        filefoldernavigator.allow_folder_selection = True
         filefoldernavigator.attr_class = 'FileFolderNavigator'
         filefoldernavigator.attr_editor_newclass = False
         filefoldernavigator.css_display = 'grid'
@@ -91,6 +93,8 @@ class PepeApp(App):
         filefoldernavigator.multiple_selection = False
         filefoldernavigator.selection_folder = '.'
         filefoldernavigator.variable_name = 'filefoldernavigator0'
+        filefoldernavigator.on_folder_item_selected.do(self.on_folder_selected)
+
         vbox0.append(filefoldernavigator, 'filefoldernavigator0')
         hbox0.append(vbox0, 'vbox0')
         image_container = Container()
