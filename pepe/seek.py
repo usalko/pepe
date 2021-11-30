@@ -3,9 +3,15 @@
 
 from remi.gui import *
 from remi import start, App
+from os import listdir
+from os.path import join
+from functools import reduce
+from operator import iconcat
 
 
 class PepeApp(App):
+    file_list: ListView = None
+
     def __init__(self, *args, **kwargs):
         # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
         if not 'editing_mode' in kwargs.keys():
@@ -26,7 +32,9 @@ class PepeApp(App):
         svg_glass.redraw()
 
     def on_folder_selected(self, widget, folder_item_widget, folder_item):
-        print(f'Folder item selected {folder_item}')
+        self.file_list.empty()
+        for name, full_path in reduce(iconcat, [[(name, join(f, name)) for name in listdir(f)] for f in folder_item], []):
+            self.file_list.append(value=name, key=full_path)
 
     @staticmethod
     def construct_ui(self):
@@ -66,16 +74,16 @@ class PepeApp(App):
         vbox0.css_top = '0px'
         vbox0.css_width = '20%'
         vbox0.variable_name = 'vbox0'
-        file_list = ListView()
-        file_list.attr_class = 'ListView'
-        file_list.attr_editor_newclass = False
-        file_list.css_height = '80%'
-        file_list.css_order = '-1'
-        file_list.css_position = 'static'
-        file_list.css_top = '0px'
-        file_list.css_width = '100%'
-        file_list.variable_name = 'listview0'
-        vbox0.append(file_list, 'listview0')
+        self.file_list = ListView()
+        self.file_list.attr_class = 'ListView'
+        self.file_list.attr_editor_newclass = False
+        self.file_list.css_height = '80%'
+        self.file_list.css_order = '-1'
+        self.file_list.css_position = 'static'
+        self.file_list.css_top = '0px'
+        self.file_list.css_width = '100%'
+        self.file_list.variable_name = 'listview0'
+        vbox0.append(self.file_list, 'listview0')
         filefoldernavigator = FileFolderNavigator()
         filefoldernavigator.allow_file_selection = False
         filefoldernavigator.allow_folder_selection = True
