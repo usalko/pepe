@@ -4,13 +4,15 @@
 from remi.gui import *
 from remi import start, App
 from os import listdir
-from os.path import join
+from os.path import join, isfile
 from functools import reduce
 from operator import iconcat
-
+from traceback import format_exception
+from widgets.local_image import LocalImage
 
 class PepeApp(App):
     file_list: ListView = None
+    e_image: LocalImage = None
 
     def __init__(self, *args, **kwargs):
         # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
@@ -27,7 +29,10 @@ class PepeApp(App):
 
     def on_img_mousedown(self, widget, x, y):
         svg_glass: Svg = widget
-        svg_glass.append(SvgCircle(x, y, 30))
+        dot = SvgCircle(x, y, 6)
+        dot.set_stroke(width=2, color='orange')
+        dot.set_fill(color='#00000000')
+        svg_glass.append(dot)
         print(f'Image mouse down ({x}, {y})!')
         svg_glass.redraw()
 
@@ -35,6 +40,14 @@ class PepeApp(App):
         self.file_list.empty()
         for name, full_path in reduce(iconcat, [[(name, join(f, name)) for name in listdir(f)] for f in folder_item], []):
             self.file_list.append(value=name, key=full_path)
+
+    def on_item_selected(self, widget, folder_item_path: str):
+        if isfile(folder_item_path):
+            try:
+                self.e_image.load(folder_item_path)
+                self.e_image.refresh()
+            except BaseException as e:
+                print(f'Error process folder item {folder_item_path}. Explanation: {format_exception(type(e), e, e.__traceback__)}')
 
     @staticmethod
     def construct_ui(self):
@@ -83,6 +96,7 @@ class PepeApp(App):
         self.file_list.css_top = '0px'
         self.file_list.css_width = '100%'
         self.file_list.variable_name = 'listview0'
+        self.file_list.onselection.do(self.on_item_selected)
         vbox0.append(self.file_list, 'listview0')
         filefoldernavigator = FileFolderNavigator()
         filefoldernavigator.allow_file_selection = False
@@ -114,18 +128,18 @@ class PepeApp(App):
         image_container.css_top = '0px'
         image_container.css_width = '80%'
         image_container.variable_name = 'container1'
-        e_image = Image()
-        e_image.attr_class = 'Image'
-        e_image.attr_editor_newclass = False
-        e_image.attr_src = ''
-        e_image.css_align_content = 'flex-start'
-        e_image.css_height = '100%'
-        e_image.css_left = '20%'
-        e_image.css_position = 'static'
-        e_image.css_top = '0px'
-        e_image.css_width = '100%'
-        e_image.variable_name = 'image0'
-        image_container.append(e_image, 'image0')
+        self.e_image = LocalImage()
+        self.e_image.attr_class = 'Image'
+        self.e_image.attr_editor_newclass = False
+        self.e_image.attr_src = ''
+        self.e_image.css_align_content = 'flex-start'
+        self.e_image.css_height = '100%'
+        self.e_image.css_left = '20%'
+        self.e_image.css_position = 'static'
+        self.e_image.css_top = '0px'
+        self.e_image.css_width = '100%'
+        self.e_image.variable_name = 'image0'
+        image_container.append(self.e_image, 'image0')
         svg_glass = Svg()
         svg_glass.attr_class = 'Svg'
         svg_glass.attr_editor_newclass = False
