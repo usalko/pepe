@@ -25,3 +25,6 @@ class LocalImage(Image):
         headers = {
             'Content-type': self.mimetype if self.mimetype else 'application/octet-stream'}
         return [self.imagedata, headers]
+
+    def clear(self):
+        self.load('./assets/please-select-image.png')

@@ -44,10 +44,20 @@ class PepeApp(App):
     def on_item_selected(self, widget, folder_item_path: str):
         if isfile(folder_item_path):
             try:
+                self.mimetype, self.encoding = mimetypes.guess_type(folder_item_path)
+                if not('image' in self.mimetype):
+                    raise Exception(f'Not an image, mime type is: {self.mimetype}')
                 self.e_image.load(folder_item_path)
                 self.e_image.refresh()
             except BaseException as e:
                 print(f'Error process folder item {folder_item_path}. Explanation: {format_exception(type(e), e, e.__traceback__)}')
+                self.e_image.clear()
+
+    def onload(self, emitter):
+        """ WebPage Event that occurs on webpage loaded
+        """
+        super(PepeApp, self).onload(emitter)
+        self.e_image.clear()
 
     @staticmethod
     def construct_ui(self):
@@ -135,6 +145,7 @@ class PepeApp(App):
         self.e_image.css_align_content = 'flex-start'
         self.e_image.css_height = '100%'
         self.e_image.css_left = '20%'
+        self.e_image.style['object-fit'] = 'scale-down'
         self.e_image.css_position = 'static'
         self.e_image.css_top = '0px'
         self.e_image.css_width = '100%'
