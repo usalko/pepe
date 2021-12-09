@@ -1,0 +1,14 @@
+<svg width="400" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <style>
+    svg {
+      /* Default styles to be inherited */
+      fill: white;
+      stroke: black;
+      background: url(./sample-image-2.jpeg)
+    }
+    text { fill: black; stroke: none; }
+    path { fill: none; }
+    </style>
+
+    <path d="M 10 10 H 90 V 90 H 10 L 10 10" />
+</svg>

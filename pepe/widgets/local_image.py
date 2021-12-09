@@ -1,10 +1,13 @@
 from remi.gui import *
 from time import time
+from model.image_svg_model import ImageSvgModel
 
 class LocalImage(Image):
+
     def __init__(self, file_path_name=None, **kwargs):
         super(LocalImage, self).__init__('/assets/please-select-image.png', **kwargs)
 
+        self.model = ImageSvgModel()
         self.imagedata = None
         self.mimetype = None
         self.encoding = None
