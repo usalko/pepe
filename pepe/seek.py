@@ -34,6 +34,7 @@ class PepeApp(App):
         dot.set_fill(color='#00000000')
         svg_glass.append(dot)
         self.e_image.model.add_point(x, y)
+        # self.e_image.model_str = svg_glass._backup_repr
         print(f'Image mouse down ({x}, {y})!')
         svg_glass.redraw()
 
