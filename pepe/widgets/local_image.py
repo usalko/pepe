@@ -26,6 +26,8 @@ class LocalImage(Image):
         if exists(svg_index_path) and isfile(svg_index_path):
             with open(svg_index_path, 'rb') as f:
                 self.svg_index = f.read().decode('utf-8')
+        else:
+            self.svg_index = None
         self.refresh()
 
     def refresh(self):

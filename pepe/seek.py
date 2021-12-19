@@ -8,6 +8,7 @@ from os.path import join, isfile
 from functools import reduce
 from operator import iconcat
 from traceback import format_exception
+from widgets.svg_glass import SvgGlass
 from widgets.local_image import LocalImage
 from xmltodict import parse as xml_to_dict_parse
 
@@ -15,7 +16,7 @@ from xmltodict import parse as xml_to_dict_parse
 class PepeApp(App):
     file_list: ListView = None
     e_image: LocalImage = None
-    svg_glass: Svg = None
+    svg_glass: SvgGlass = None
 
     def __init__(self, *args, **kwargs):
         # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
@@ -31,7 +32,7 @@ class PepeApp(App):
         return PepeApp.construct_ui(self)
 
     def on_img_mousedown(self, widget, x, y):
-        svg_glass: Svg = widget
+        svg_glass: SvgGlass = widget
         dot = SvgCircle(x, y, 6)
         dot.set_stroke(width=2, color='orange')
         dot.set_fill(color='#00000000')
@@ -71,7 +72,7 @@ class PepeApp(App):
                         f'Not an image, mime type is: {self.mimetype}')
                 self.e_image.load(folder_item_path)
 
-                # self.svg_glass.append
+                self.svg_glass.clear()
                 if self.e_image.svg_index:
                     svg_index = xml_to_dict_parse(self.e_image.svg_index)
                     self._parse_svg_index(svg_index['svg'])
@@ -82,8 +83,7 @@ class PepeApp(App):
                 print(
                     f'Error process folder item {folder_item_path}. Explanation: {format_exception(type(e), e, e.__traceback__)}')
                 self.e_image.clear()
-                self.svg_glass._backup_repr = '<svg></svg>'
-                self.svg_glass.redraw()
+                self.svg_glass.clear()
 
     def onload(self, emitter):
         """ WebPage Event that occurs on webpage loaded
@@ -183,7 +183,7 @@ class PepeApp(App):
         self.e_image.css_width = '100%'
         self.e_image.variable_name = 'image0'
         image_container.append(self.e_image, 'image0')
-        self.svg_glass = Svg()
+        self.svg_glass = SvgGlass()
         self.svg_glass.attr_class = 'Svg'
         self.svg_glass.attr_editor_newclass = False
         self.svg_glass.css_align_content = 'flex-start'
