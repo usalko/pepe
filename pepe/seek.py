@@ -9,10 +9,13 @@ from functools import reduce
 from operator import iconcat
 from traceback import format_exception
 from widgets.local_image import LocalImage
+from xmltodict import parse as xml_to_dict_parse
+
 
 class PepeApp(App):
     file_list: ListView = None
     e_image: LocalImage = None
+    svg_glass: Svg = None
 
     def __init__(self, *args, **kwargs):
         # DON'T MAKE CHANGES HERE, THIS METHOD GETS OVERWRITTEN WHEN SAVING IN THE EDITOR
@@ -34,26 +37,53 @@ class PepeApp(App):
         dot.set_fill(color='#00000000')
         svg_glass.append(dot)
         self.e_image.model.add_point(x, y)
-        # self.e_image.model_str = svg_glass._backup_repr
+        self.e_image.svg_index = svg_glass._backup_repr
         print(f'Image mouse down ({x}, {y})!')
         svg_glass.redraw()
 
     def on_folder_selected(self, widget, folder_item_widget, folder_item):
         self.file_list.empty()
         for name, full_path in reduce(iconcat, [[(name, join(f, name)) for name in listdir(f)] for f in folder_item], []):
+            # Didn't show svg index for image
+            if name.startswith('.') and name.endswith('.svg'):
+                continue
             self.file_list.append(value=name, key=full_path)
+
+    def _parse_svg_index(self, svg_index: dict):
+        for key, value in svg_index.items():
+            if key.startswith('@'):
+                continue
+            if key == 'circle':
+                for svg_circle in value:
+                    circle = SvgCircle(svg_circle['@cx'], svg_circle['@cy'], 6)
+                    circle.set_stroke(width=2, color='orange')
+                    circle.set_fill(color='#00000000')
+                    self.svg_glass.append(circle)
 
     def on_item_selected(self, widget, folder_item_path: str):
         if isfile(folder_item_path):
+            self.e_image.save()
             try:
-                self.mimetype, self.encoding = mimetypes.guess_type(folder_item_path)
+                self.mimetype, self.encoding = mimetypes.guess_type(
+                    folder_item_path)
                 if not('image' in self.mimetype):
-                    raise Exception(f'Not an image, mime type is: {self.mimetype}')
+                    raise Exception(
+                        f'Not an image, mime type is: {self.mimetype}')
                 self.e_image.load(folder_item_path)
+
+                # self.svg_glass.append
+                if self.e_image.svg_index:
+                    svg_index = xml_to_dict_parse(self.e_image.svg_index)
+                    self._parse_svg_index(svg_index['svg'])
+
+                self.svg_glass.redraw()
                 self.e_image.refresh()
             except BaseException as e:
-                print(f'Error process folder item {folder_item_path}. Explanation: {format_exception(type(e), e, e.__traceback__)}')
+                print(
+                    f'Error process folder item {folder_item_path}. Explanation: {format_exception(type(e), e, e.__traceback__)}')
                 self.e_image.clear()
+                self.svg_glass._backup_repr = '<svg></svg>'
+                self.svg_glass.redraw()
 
     def onload(self, emitter):
         """ WebPage Event that occurs on webpage loaded
@@ -153,22 +183,22 @@ class PepeApp(App):
         self.e_image.css_width = '100%'
         self.e_image.variable_name = 'image0'
         image_container.append(self.e_image, 'image0')
-        svg_glass = Svg()
-        svg_glass.attr_class = 'Svg'
-        svg_glass.attr_editor_newclass = False
-        svg_glass.css_align_content = 'flex-start'
-        svg_glass.css_height = '100%'
-        svg_glass.css_left = '20%'
-        svg_glass.css_position = 'absolute'
-        svg_glass.css_top = '0px'
-        svg_glass.css_width = '80%'
-        svg_glass.variable_name = 'svg0'
-        image_container.append(svg_glass, 'svg0')
+        self.svg_glass = Svg()
+        self.svg_glass.attr_class = 'Svg'
+        self.svg_glass.attr_editor_newclass = False
+        self.svg_glass.css_align_content = 'flex-start'
+        self.svg_glass.css_height = '100%'
+        self.svg_glass.css_left = '20%'
+        self.svg_glass.css_position = 'absolute'
+        self.svg_glass.css_top = '0px'
+        self.svg_glass.css_width = '80%'
+        self.svg_glass.variable_name = 'svg0'
+        image_container.append(self.svg_glass, 'svg0')
         hbox0.append(image_container, 'container1')
         container0.append(hbox0, 'hbox0')
 
         # Setup logic
-        svg_glass.onmousedown.do(self.on_img_mousedown)
+        self.svg_glass.onmousedown.do(self.on_img_mousedown)
 
         self.container0 = container0
         return self.container0
