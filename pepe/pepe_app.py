@@ -37,10 +37,16 @@ class PepeApp(App):
         dot.set_stroke(width=2, color='orange')
         dot.set_fill(color='#00000000')
         svg_glass.append(dot)
+        # Update the model
         self.e_image.model.add_point(x, y)
-        self.e_image.svg_index = svg_glass._backup_repr
-        print(f'Image mouse down ({x}, {y})!')
+        # Savepoint
+        self.e_image.svg_index = svg_glass.repr()
+        # TODO: use queue instead direct call
+        self.e_image.save()
+        # Set needs update flag to a true
+        svg_glass.children.changed = True
         svg_glass.redraw()
+        print(f'Image mouse down ({x}, {y})!')
 
     def on_folder_selected(self, widget, folder_item_widget, folder_item):
         self.file_list.empty()

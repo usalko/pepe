@@ -1,7 +1,7 @@
 from unittest import TestCase
-from pepe.seek import Seek
+from pepe.pepe_app import PepeApp
 
-class SeekTest(TestCase):
+class PepeAppTest(TestCase):
 
     def test(self):
-        Seek().run()
+        PepeApp().run()
