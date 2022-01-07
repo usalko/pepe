@@ -40,6 +40,14 @@ class SvgGlass(Svg):
         super().append(child)
         self.polyList.append(child)
 
+    def has_the_same_center(self, x: float, y: float, radius: float):
+        for poly in self.polyList:
+            if isinstance(poly, SvgCircle):
+                e: SvgCircle = poly
+                if ((float(e.attr_cx) - float(x)) ** 2 + (float(e.attr_cy) - float(y)) ** 2) <= float(radius) ** 2:
+                    return e
+        return None
+
     def clear(self):
         for svg_item in self.polyList:
             self.remove_child(svg_item)

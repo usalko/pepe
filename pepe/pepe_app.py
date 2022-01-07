@@ -33,12 +33,16 @@ class PepeApp(App):
 
     def on_img_mousedown(self, widget, x, y):
         svg_glass: SvgGlass = widget
-        dot = SvgCircle(x, y, 6)
-        dot.set_stroke(width=2, color='orange')
-        dot.set_fill(color='#00000000')
-        svg_glass.append(dot)
-        # Update the model
-        self.e_image.model.add_point(x, y)
+        # if it's the same point remove it instead add
+        the_same_poly = svg_glass.has_the_same_center(x, y, 6)
+        if the_same_poly:
+            svg_glass.remove_child(the_same_poly)
+        else:
+            dot = SvgCircle(x, y, 6)
+            dot.set_stroke(width=2, color='orange')
+            dot.set_fill(color='#00000000')
+            svg_glass.append(dot)
+
         # Savepoint
         self.e_image.svg_index = svg_glass.repr()
         # TODO: use queue instead direct call
