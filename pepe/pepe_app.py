@@ -34,9 +34,10 @@ class PepeApp(App):
     def on_img_mousedown(self, widget, x, y):
         svg_glass: SvgGlass = widget
         # if it's the same point remove it instead add
-        the_same_poly = svg_glass.has_the_same_center(x, y, 6)
-        if the_same_poly:
-            svg_glass.remove_child(the_same_poly)
+        the_same_poly_list = svg_glass.has_the_same_center(x, y, 6)
+        if the_same_poly_list:
+            for the_same_poly in the_same_poly_list:
+                svg_glass.remove_child(the_same_poly)
         else:
             dot = SvgCircle(x, y, 6)
             dot.set_stroke(width=2, color='orange')
@@ -87,6 +88,8 @@ class PepeApp(App):
                     svg_index = xml_to_dict_parse(self.e_image.svg_index)
                     self._parse_svg_index(svg_index['svg'])
 
+                # Set needs update flag to a true
+                self.svg_glass.children.changed = True
                 self.svg_glass.redraw()
                 self.e_image.refresh()
             except BaseException as e:

@@ -1,6 +1,8 @@
 from remi.gui import *
 
+
 class SvgGlass(Svg):
+
     def __init__(self, _width=None, _height=None):
         super(SvgGlass, self).__init__(width=_width, height=_height)
         self.width = _width
@@ -36,20 +38,25 @@ class SvgGlass(Svg):
         self.remove_child(poly.textXMax)
         self.remove_child(poly.textYVal)
 
+    def remove_child(self, child):
+        super().remove_child(child)
+        self.polyList.remove(child)
+
     def append(self, child):
         super().append(child)
         self.polyList.append(child)
 
     def has_the_same_center(self, x: float, y: float, radius: float):
+        remove_candidates = []
         for poly in self.polyList:
             if isinstance(poly, SvgCircle):
                 e: SvgCircle = poly
                 if ((float(e.attr_cx) - float(x)) ** 2 + (float(e.attr_cy) - float(y)) ** 2) <= float(radius) ** 2:
-                    return e
-        return None
+                    remove_candidates.append(e)
+        return remove_candidates
 
     def clear(self):
-        for svg_item in self.polyList:
+        for svg_item in self.polyList[:]:
             self.remove_child(svg_item)
         self.polyList.clear()
 
